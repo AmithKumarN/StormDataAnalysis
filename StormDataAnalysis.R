@@ -48,7 +48,7 @@ barplot(totPropertySorted$Property, names.arg = totPropertySorted$Event, col = '
 barplot(totCropSorted$Crop, names.arg = totCropSorted$Event, col = 'Green', main = 'Top 20 Weather Events for Crop Damage', ylab = 'Amount of  Crop Damage', ylim = c(0, 3500000))
 
 
-totTotalCost <- aggregate(noaaDF$CROPDMG+noaaDF$PROPDMG, by = list(noaaDF$EVTYPE), "sum")
+totTotalCost <- aggregate(stormData$CROPDMG+stormData$PROPDMG, by = list(stormData$EVTYPE), "sum")
 names(totTotalCost) <- c("Event", "TotalCost")
 totTotalCostSorted <- totTotalCost[order(-totTotalCost$TotalCost), ][1:20, ]
 totTotalCostSorted

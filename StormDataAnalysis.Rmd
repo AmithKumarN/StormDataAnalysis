@@ -1,0 +1,118 @@
+---
+title: "Weather Data Analysis 1950 to 2011"
+author: "Amith Kumar"
+date: "08/09/2020"
+output: html_document
+---
+
+Storms and other severe weather events can cause both public health and economic problems for communities and municipalities. Many severe events can result in fatalities, injuries, and property damage, and preventing such outcomes to the extent possible is a key concern.
+
+This project involves exploring the U.S. National Oceanic and Atmospheric Administration's (NOAA) storm database. This database tracks characteristics of major storms and weather events in the United States, including when and where they occur, as well as estimates of any fatalities, injuries, and property damage.
+
+The data for this assignment come in the form of a comma-separated-value file compressed via the bzip2 algorithm to reduce its size.
+
+### Preprocessing the data:
+
+Downloading the data:
+```{r}
+file_name <- "stormData.csv.bz2"
+if(!file.exists(file_name))
+{
+  download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2", file_name, method = "curl")
+}
+
+doc_name <- "stormDataDocumentation.pdf"
+if(!file.exists(doc_name))
+{
+  download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fpeer2_doc%2Fpd01016005curr.pdf", doc_name, method = "curl")
+}
+```
+
+Reading and Previewing the data:
+```{r, cache = TRUE}
+stormData <- read.csv(file_name)
+str(stormData)
+```
+
+Loading the required packages:
+```{r}
+library(dplyr)
+library(ggplot2)
+```
+
+### 1. Across the United States, which types of events (as indicated in the \color{red}{\verb|EVTYPE|}EVTYPE variable) are most harmful with respect to population health?
+
+To answer this question, we calculate the total number of fatalities and injuries caused by each of the weather event and plot the top 10 in each of the cases.
+
+Calculating the total fatalities:
+```{r}
+totFatalities <- aggregate(stormData$FATALITIES, by = list(stormData$EVTYPE), "sum")
+names(totFatalities) <- c("Event", "Fatalities")
+totFatalitiesSorted <- totFatalities[order(-totFatalities$Fatalities), ][1:10, ]
+totFatalitiesSorted
+```
+From this it can be seen that Tornado has the highest fatality count followed by excessive heat.
+
+Calculating the total Injuries:
+```{r}
+totInjuries <- aggregate(stormData$INJURIES, by = list(stormData$EVTYPE), "sum")
+names(totInjuries) <- c("Event", "Injuries")
+totInjuriesSorted <- totInjuries[order(-totInjuries$Injuries), ][1:10, ]
+totInjuriesSorted
+```
+From this it can be seen that Tornado has the highest injury count followed by TSTM wind.
+
+Plotting them in a graph:
+```{r}
+par(mfrow = c(1,2), mar = c(4,4,2,4), las = 3, cex = 0.7, cex.main = 1.4, cex.lab = 1.2)
+barplot(totFatalitiesSorted$Fatalities, names.arg = totFatalitiesSorted$Event, col = 'blue', main = 'Top 20 Weather Events for Fatalities', ylab = 'Number of Fatalities')
+barplot(totInjuriesSorted$Injuries, names.arg = totInjuriesSorted$Event, col = 'light blue', main = 'Top 20 Weather Events for Injuries', ylab = 'Number of Injuries')
+```
+
+### 2. Across the United States, which types of events have the greatest economic consequences?
+
+To answer this question, we find out the damage dealt to Property and Crop separately and also we find the total cost esstimate of the damage caused by each weather event.
+
+Calculating the total damage to Property:
+```{r}
+totProperty <- aggregate(stormData$PROPDMG, by = list(stormData$EVTYPE), "sum")
+names(totProperty) <- c("Event", "Property")
+totPropertySorted <- totProperty[order(-totProperty$Property), ][1:20, ]
+totPropertySorted
+```
+It can be seen that Tornado, Flash Flood and TSTM Wind cause most of the damage to property.
+
+Calculating the damage to Crops:
+```{r}
+totCrop <- aggregate(stormData$CROPDMG, by = list(stormData$EVTYPE), "sum")
+names(totCrop) <- c("Event", "Crop")
+totCropSorted <- totCrop[order(-totCrop$Crop), ][1:20, ]
+totCropSorted
+```
+In this case, most of the damage is caused by Hail, Flash Flood, Flood, TSTM Wind and Tornado.
+
+Plotting them in a graph:
+```{r}
+par(mfrow = c(1, 2), mar = c(10, 4, 2, 2), las = 3, cex = 0.7, cex.main = 1.4, cex.lab = 1.2)
+barplot(totPropertySorted$Property, names.arg = totPropertySorted$Event, col = 'Brown', main = 'Top 20 Weather Events for Property Damage ', ylab = 'Amount of Property Damage', ylim = c(0, 3500000))
+barplot(totCropSorted$Crop, names.arg = totCropSorted$Event, col = 'Green', main = 'Top 20 Weather Events for Crop Damage', ylab = 'Amount of  Crop Damage', ylim = c(0, 3500000))
+```
+
+Now to find the total damage dealt by these weather events:
+```{r}
+totTotalCost <- aggregate(stormData$CROPDMG+stormData$PROPDMG, by = list(stormData$EVTYPE), "sum")
+names(totTotalCost) <- c("Event", "TotalCost")
+totTotalCostSorted <- totTotalCost[order(-totTotalCost$TotalCost), ][1:20, ]
+totTotalCostSorted
+```
+In total, it is clear that Tornado causes most of the damage and has greater economic consequences.
+
+Plotting it in a graph:
+```{r}
+par(mfrow = c(1,1), mar = c(10, 4, 2, 2), las = 3, cex = 0.7, cex.main = 1.4, cex.lab = 1.2)
+barplot(totTotalCostSorted$TotalCost, names.arg = totTotalCostSorted$Event, col = 'Black', main = 'Top 20 Weather Events for total Damage ', ylab = 'Amount of total Damage', ylim = c(0, 3500000))
+```
+
+### Result:
+Thus, from this analysis we found that Tornadoes cause most of the damage to both properties, crops and also has the highest fatality count and injury count. Natural hazards are not inevitable but using this analysis we can take preventive measures on the most fatal and damaging weather events.
+
