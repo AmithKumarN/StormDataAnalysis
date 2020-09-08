@@ -31,13 +31,13 @@ par(mfrow = c(1,2), mar = c(4,4,2,4), las = 3, cex = 0.7, cex.main = 1.4, cex.la
 barplot(totFatalitiesSorted$Fatalities, names.arg = totFatalitiesSorted$Event, col = 'blue', main = 'Top 20 Weather Events for Fatalities', ylab = 'Number of Fatalities')
 barplot(totInjuriesSorted$Injuries, names.arg = totInjuriesSorted$Event, col = 'light blue', main = 'Top 20 Weather Events for Injuries', ylab = 'Number of Injuries')
 
-totProperty <- aggregate(noaaDF$PROPDMG, by = list(noaaDF$EVTYPE), "sum")
+totProperty <- aggregate(stormData$PROPDMG, by = list(stormData$EVTYPE), "sum")
 names(totProperty) <- c("Event", "Property")
 totPropertySorted <- totProperty[order(-totProperty$Property), ][1:20, ]
 totPropertySorted
 
 
-totCrop <- aggregate(noaaDF$CROPDMG, by = list(noaaDF$EVTYPE), "sum")
+totCrop <- aggregate(stormData$CROPDMG, by = list(stormData$EVTYPE), "sum")
 names(totCrop) <- c("Event", "Crop")
 totCropSorted <- totCrop[order(-totCrop$Crop), ][1:20, ]
 totCropSorted
